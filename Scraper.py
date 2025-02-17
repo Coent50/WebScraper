@@ -4,7 +4,7 @@
 import pandas as pd
 from bs4 import BeautifulSoup
 import requests
-df_restaurants = pd.read_csv("")
+df_restaurants = pd.read_csv("Group 16 - Seattle.csv")
 
 # Add a new column 'not_recommended_link' based on the existing 'url' column
 df_restaurants['not_recommended_url'] = df_restaurants['url'].apply(
@@ -17,11 +17,12 @@ df_restaurants['not_recommended_url'] = df_restaurants['url'].apply(
 url = df_restaurants['not_recommended_url'][2]
 name_business = df_restaurants['name'][2]
 
+
 html = requests.get(url)
 soup = BeautifulSoup(html.content, 'lxml')
 
 #soup_username = soup.select()
-soup_username = soup.select('') 
+soup_username = soup.select('.review-list-wide .user-display-name') 
 soup_username[1:5]
 
 username = []
@@ -32,7 +33,7 @@ for name in soup_username:
 username[0:5]
 
 # Get ratings
-soup_stars=soup.select('') 
+soup_stars=soup.select('.review-list-wide .rating-large') 
 soup_stars[0:5]
 
 rating = []
@@ -50,7 +51,7 @@ rating  = [re.sub(' star rating', '',  r) for r in rating]
 rating = [float(i) for i in rating]
 
 #Get date of rating
-soup_date=soup.select('') 
+soup_date=soup.select('.review-list-wide .rating-qualifier') 
 soup_date[0:5]
 
 date_review = []
@@ -67,7 +68,7 @@ date_review  = [re.sub('\n', '',  dr) for dr in date_review]
 date_review  = [re.sub(' ', '',  dr) for dr in date_review]
 
 #Get the review text
-html_texts=soup.select('') 
+html_texts=soup.select('.review-list-wide p') 
 html_texts[0:10]
 
 html_text = []
@@ -87,10 +88,10 @@ url_restaurant_mult = [url] * len(username)
 
 RatingDataSet = list(zip(name_business_mult, url_restaurant_mult, username, rating, date_review, html_text))
 
-df_rating = pd.DataFrame(data = RatingDataSet, columns=['name_business','url', 'username', 'rating', 'date_review', 'text'])
+df_rating = pd.DataFrame(data = RatingDataSet, columns=['name','url', 'username', 'rating', 'date_review', 'text'])
 df_rating.iloc[:10]
 
-df_rating.to_csv('..../boston_ratings_workshop.csv',index=False,header=True,encoding='utf8')
+df_rating.to_csv('Group 16 - Seattle - first restaurant.csv',index=False,header=True,encoding='utf8')
 
 #####Step 3: Putting Step 2 in a loop
 
@@ -103,26 +104,22 @@ for u in range(0,4):
         html = requests.get(url)
         soup = BeautifulSoup(html.content, 'lxml')
         
-        soup_username = soup.select('')
-        soup_username[1:5]
+        soup_username = soup.select('.review-list-wide .user-display-name')
         
         username = []
         
         for name in soup_username:
             username.append(name.string)
             
-        username[0:5]
         
         # Get ratings
-        soup_stars=soup.select('')
-        soup_stars[0:5]
+        soup_stars=soup.select('.review-list-wide .rating-large')
         
         rating = []
         
         for stars in soup_stars:
             rating.append(stars.attrs['title'])
-        
-        rating[0:5]   
+         
         
         # Get rid of text "star rating"
         import re
@@ -132,15 +129,13 @@ for u in range(0,4):
         rating = [float(i) for i in rating]
         
         #Get date of rating
-        soup_date=soup.select('') 
-        soup_date[0:5]
+        soup_date=soup.select('.review-list-wide .rating-qualifier') 
         
         date_review = []
         
         for date in soup_date:
             date_review.append(date.text.strip())
         
-        date_review[0:5]
         
         # Get rid of text "Updated review", "Previous review", "\n", and multiple spaces
         date_review  = [re.sub('Updated review', '',  dr) for dr in date_review]
@@ -149,8 +144,7 @@ for u in range(0,4):
         date_review  = [re.sub(' ', '',  dr) for dr in date_review]
         
         #Get the review text
-        html_texts=soup.select('')
-        html_texts[0:10]
+        html_texts=soup.select('.review-list-wide p')
         
         html_text = []
         
@@ -168,9 +162,9 @@ for u in range(0,4):
 
         RatingDataSet = list(zip(name_business_mult, url_restaurant_mult, username, rating, date_review, html_text))
 
-        df_rating = pd.DataFrame(data = RatingDataSet, columns=['name_business', 'url', 'username', 'rating', 'date_review', 'text'])
+        df_rating = pd.DataFrame(data = RatingDataSet, columns=['name', 'url', 'username', 'rating', 'date_review', 'text'])
 
-        with open('..../boston_ratings150_workshop.csv', 'a',newline='') as f:
+        with open('Group 16 - Seattle - reviews 4 restaurants.csv', 'a',newline='') as f:
             df_rating.to_csv(f, index=False, header=False, encoding='utf8')
                 
         print(u)
@@ -179,3 +173,4 @@ for u in range(0,4):
         
     except:
         print("A page was not loaded correctly")
+
