@@ -10,7 +10,6 @@ df_restaurants = pd.read_csv("")
 df_restaurants['not_recommended_url'] = df_restaurants['url'].apply(
     lambda x: x.replace('/biz/', '/not_recommended_reviews/') + '?not_recommended_start=0' if '/biz/' in x else x)
 
-####homofiel
 
 ################STEP 2: Going through the subpages
 
