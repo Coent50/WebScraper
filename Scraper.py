@@ -11,6 +11,8 @@ def home_page_scrap():
 
     df_restaurants = pd.read_csv("Group 16 - Seattle.csv")
 
+    data = [] 
+
     # Loop through all restaurants in the dataset
     for i in range(0,4):  
     
@@ -62,6 +64,20 @@ def home_page_scrap():
         
         for claim in soup_claim:
             claimed.append(claim.text.strip()) 
+        
+    # Store data in dictionary
+        data.append({
+            "Name": name_business,
+            "URL": url,
+            "Rating": rating[0] if rating else "N/A",
+            "Reviews": reviews[0] if reviews else "N/A",
+            "Price": price_tag[0] if price_tag else "N/A",
+            "Type": restaurant_type[0] if restaurant_type else "N/A",
+            "Claimed": claimed[0] if claimed else "N/A"
+        })
+        df_output = pd.DataFrame(data)
+        # Save to CSV
+        df_output.to_csv("scraped_data.csv", index=False)
 
 home_page_scrap()
 
