@@ -5,6 +5,7 @@ import pandas as pd
 from bs4 import BeautifulSoup
 import requests
 import re
+import time
 
 def home_page_scrap():
 
@@ -251,7 +252,6 @@ def non_rec_scrap ():
                     df_rating.to_csv(f, index=False, header=False, encoding='utf8')
                         
                 print(u)
-                import time
                 time.sleep(2)
             
             except Exception as e:
