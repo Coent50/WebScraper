@@ -1,5 +1,3 @@
-################STEP 1: Motherlist (condensed)
-
 # Load packages and list of restaurants
 import pandas as pd
 from bs4 import BeautifulSoup
@@ -83,13 +81,11 @@ def non_rec_scrap ():
     df_restaurants['not_recommended_url'] = df_restaurants['url'].apply(
         lambda x: x.replace('/biz/', '/not_recommended_reviews/') + '?not_recommended_start=0' if '/biz/' in x else x)
 
-    ################STEP 2: Going through the subpages
-
     #collect variables for restaurants
     url = df_restaurants['not_recommended_url'][2]
     name_business = df_restaurants['name'][2]
 
-    #####Step 3: Putting Step 2 in a loop
+    # Collecting the subpage data through a loop
     for u in range(0,4):
         base_url = df_restaurants.loc[u, 'url']
         name_business = df_restaurants.loc[u, 'name']
@@ -136,8 +132,7 @@ def non_rec_scrap ():
                 
                 for stars in soup_stars:
                     rating.append(stars.attrs['title'])
-                
-                
+                    
                 # Get rid of text "star rating"
                 rating  = [re.sub(' star rating', '',  r) for r in rating]
                 
