@@ -57,12 +57,11 @@ def home_page_scrap():
             restaurant_type.append(type.text.strip())  
 
         # Get claimed
-        soup_claim = soup.select('.y-css-1jz061g .y-css-1x1e1r2')  
+        soup_claim = soup.select('.y-css-1t10hx3')  
         claimed = []
         
         for claim in soup_claim:
             claimed.append(claim.text.strip()) 
-
 
 home_page_scrap()
 
