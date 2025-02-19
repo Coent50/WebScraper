@@ -9,7 +9,63 @@ import time
 
 def home_page_scrap():
 
-    ha
+    df_restaurants = pd.read_csv("Group 16 - Seattle.csv")
+
+    # Loop through all restaurants in the dataset
+    for i in range(0,4):  
+    
+        #collect variables for restaurants
+        url = df_restaurants['url'][i]
+        name_business = df_restaurants['name'][i]
+        html = requests.get(url)
+        soup = BeautifulSoup(html.content, 'lxml')
+
+        # Get ratings
+        soup_stars=soup.select('.arrange-unit-fill__09f24__CUubG.y-css-1n5biw7 .y-css-1jz061g') 
+        rating = []
+
+        for stars in soup_stars:
+            rating.append(stars.text.strip) 
+
+        rating[0:5]   
+
+        # Get rid of text "star rating"
+        #rating  = [re.sub(' star rating', '',  r) for r in rating]
+
+        #convert from string to number
+        #rating = [float(i) for i in rating]
+
+        # Get reviews count
+        soup_review = soup.select('.y-css-r8orer .y-css-1x1e1r2')  
+        reviews = []
+        
+        for review in soup_review:
+            reviews.append(review.text.strip())  
+
+        # Get price tag
+        soup_price = soup.select('.y-css-1tsir1e')
+        price_tag = []
+        
+        for price in soup_price:
+            price_tag.append(price.text.strip()) 
+
+         # Get restaurant type 
+        soup_type = soup.select('.y-css-1jz061g .y-css-1x1e1r2')  
+        restaurant_type = []
+        
+        for type in soup_type:
+            restaurant_type.append(type.text.strip())  
+
+        # Get claimed
+        soup_claim = soup.select('.y-css-1jz061g .y-css-1x1e1r2')  
+        claimed = []
+        
+        for claim in soup_claim:
+            claimed.append(claim.text.strip()) 
+
+
+home_page_scrap()
+
 def non_rec_scrap ():
 
     df_restaurants = pd.read_csv("Group 16 - Seattle.csv")
@@ -50,7 +106,6 @@ def non_rec_scrap ():
     rating[0:5]   
 
     # Get rid of text "star rating"
-    import re
     rating  = [re.sub(' star rating', '',  r) for r in rating]
 
     #convert from string to number
@@ -177,7 +232,6 @@ def non_rec_scrap ():
                 
                 
                 # Get rid of text "star rating"
-                import re
                 rating  = [re.sub(' star rating', '',  r) for r in rating]
                 
                 #convert from string to number
@@ -189,8 +243,7 @@ def non_rec_scrap ():
                 date_review = []
                 
                 for date in soup_date:
-                    date_review.append(date.text.strip())
-                
+                    date_review.append(date.text.strip())               
                 
                 # Get rid of text "Updated review", "Previous review", "\n", and multiple spaces
                 date_review  = [re.sub('Updated review', '',  dr) for dr in date_review]
@@ -257,3 +310,4 @@ def non_rec_scrap ():
             except Exception as e:
                 print(f"A page was not loaded correctly: {e}")
 
+non_rec_scrap ()
