@@ -27,15 +27,9 @@ def home_page_scrap():
         rating = []
 
         for stars in soup_stars:
-            rating.append(stars.text.strip) 
+            rating.append(stars.text.strip()) 
 
         rating[0:5]   
-
-        # Get rid of text "star rating"
-        #rating  = [re.sub(' star rating', '',  r) for r in rating]
-
-        #convert from string to number
-        #rating = [float(i) for i in rating]
 
         # Get reviews count
         soup_review = soup.select('.y-css-r8orer .y-css-1x1e1r2')  
@@ -77,7 +71,7 @@ def home_page_scrap():
         })
         df_output = pd.DataFrame(data)
         # Save to CSV
-        df_output.to_csv("scraped_data.csv", index=False)
+        df_output.to_csv("Group 16 - Seattle - HomePage.csv", index=False)
 
 home_page_scrap()
 
