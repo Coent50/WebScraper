@@ -1,4 +1,3 @@
-# Load packages and list of restaurants
 import pandas as pd
 from bs4 import BeautifulSoup
 import requests
@@ -12,7 +11,7 @@ def home_page_scrap():
     data = [] 
 
     # Loop through all restaurants in the dataset
-    for i in range(0,4):  
+    for i in range(0,101):  
     
         #collect variables for restaurants
         url = df_restaurants['url'][i]
@@ -67,6 +66,7 @@ def home_page_scrap():
             "Type": restaurant_type[0] if restaurant_type else "N/A",
             "Claimed": claimed[0] if claimed else "N/A"
         })
+        
         df_output = pd.DataFrame(data)
         # Save to CSV
         df_output.to_csv("Group 16 - Seattle - HomePage.csv", index=False)
@@ -86,7 +86,7 @@ def non_rec_scrap ():
     name_business = df_restaurants['name'][2]
 
     # Collecting the subpage data through a loop
-    for u in range(0,4):
+    for u in range(0,101):
         base_url = df_restaurants.loc[u, 'url']
         name_business = df_restaurants.loc[u, 'name']
         
