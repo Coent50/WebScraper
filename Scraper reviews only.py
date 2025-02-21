@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 import requests
 import re
 import time
+import random
 
 def non_rec_scrap ():
 
@@ -18,7 +19,7 @@ def non_rec_scrap ():
     name_business = df_restaurants['name'][2]
 
     # Collecting the subpage data through a loop
-    for u in range(0,1):
+    for u in range(4,50):
         base_url = df_restaurants.loc[u, 'url']
         name_business = df_restaurants.loc[u, 'name']
         
@@ -139,11 +140,11 @@ def non_rec_scrap ():
 
                 df_rating = pd.DataFrame(data = RatingDataSet, columns=['name','url', 'username', 'rating', 'date_review','number of reviews', 'state (abreviation)', 'text'])
 
-                with open('Group 16 - Seattle - reviews all 100 restaurants.csv', 'a',newline='') as f:
+                with open('Group 16 - Seattle - reviews 29 restaurants.csv', 'a',newline='') as f:
                     df_rating.to_csv(f, index=False, header=False, encoding='utf8')
                         
                 print(u)
-                time.sleep(2)
+                time.sleep(random.randint(5, 10))
             
             except Exception as e:
                 print(f"A page was not loaded correctly: {e}")
