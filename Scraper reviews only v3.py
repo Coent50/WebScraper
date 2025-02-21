@@ -8,7 +8,7 @@ import random
 
 def non_rec_scrap ():
 
-    df_restaurants = pd.read_csv("Group 16 - Seattle.csv")
+    df_restaurants = pd.read_csv("/Users/coentimmerman/Desktop/BIM/WebScraper/WebScraper/Group 16 - Seattle.csv")
 
     # Add a new column 'not_recommended_link' based on the existing 'url' column
     df_restaurants['not_recommended_url'] = df_restaurants['url'].apply(
@@ -18,7 +18,7 @@ def non_rec_scrap ():
     url = df_restaurants['not_recommended_url'][2]
     name_business = df_restaurants['name'][2]
 
-    selected_rows = [ 29, 24, 25, 56, 59, 60, 62, 64, 67, 69, 75, 77, 78, 79, 83, 90, 94, 99, 100]
+    selected_rows = [ 77, 78, 79, 83, 90, 94, 99, 100]
     # Collecting the subpage data through a loop
     for u in selected_rows:
         base_url = df_restaurants.loc[u, 'url']
@@ -141,7 +141,7 @@ def non_rec_scrap ():
 
                 df_rating = pd.DataFrame(data = RatingDataSet, columns=['name','url', 'username', 'rating', 'date_review','number of reviews', 'state (abreviation)', 'text'])
 
-                with open('Group 16 - Seattle - review missing restaurants v3.csv', 'a',newline='') as f:
+                with open('Group 16 - Seattle - review missing restaurants v4.csv', 'a',newline='') as f:
                     df_rating.to_csv(f, index=False, header=False, encoding='utf8')
                         
                 print(u)
