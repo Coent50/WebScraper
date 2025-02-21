@@ -3,6 +3,25 @@ from bs4 import BeautifulSoup
 import requests
 import re
 import time
+import random
+
+def get_html_with_retry(url, delay=3):
+    #Retries the request until successful
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    }
+    while True:
+        try:
+            html = requests.get(url, headers=headers)
+            if html.status_code == 200:
+                return html
+            else:
+                print(f"HTTP Status {html.status_code}. Retrying...")
+        except requests.exceptions.RequestException as e:
+            print(f"Error: {e}. Retrying...")
+        
+        # Wait for a random delay before retrying
+        time.sleep(random.randint(5, 10))
 
 def home_page_scrap():
 
@@ -11,12 +30,12 @@ def home_page_scrap():
     data = [] 
 
     # Loop through all restaurants in the dataset
-    for i in range(0,101):  
+    for i in range(0,100):  
     
         #collect variables for restaurants
         url = df_restaurants['url'][i]
         name_business = df_restaurants['name'][i]
-        html = requests.get(url)
+        html = get_html_with_retry(url)
         soup = BeautifulSoup(html.content, 'lxml')
 
         # Get ratings
