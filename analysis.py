@@ -7,7 +7,7 @@ import re
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
-from linearmodels.panel import PanelOLS, RandomEffects
+from linearmodels.panel import PanelOLS, RandomEffects, compare
 from scipy import stats
 
 restaurants_file_path = "Group 16 - Seattle - Homepage.csv"
@@ -151,14 +151,22 @@ if not wa_count_df.empty:
     ).data[0])
 
 fig.show()
-
+print("Count per state: ", state_counts_df)
 
 ### Make barcharts for WA / non-WA review count and average rating
 wa_count = wa_count_df["Review_Count"].sum()
 non_wa_count = state_counts_df["Review_Count"].sum()
 
+print()
+print("Number of reviewers from WA:",  wa_count)
+print("Number of reviewers outside of WA:",  non_wa_count)
+
+
 wa_average_rating = reviews_df[reviews_df["State"] == "WA"]["Rating"].dropna().mean()
 non_wa_average_rating = reviews_df[reviews_df["State"] != "WA"]["Rating"].dropna().mean()
+print()
+print("Average of reviewers from WA:",  np.round(wa_average_rating,2))
+print("Average of reviewers outside of WA:",  np.round(non_wa_average_rating,2))
 
 # Define categories and values
 categories = ["Washington (WA)", "Other States"]
@@ -192,6 +200,10 @@ avg_scores = ratings_df[["Rating", "Unhelpful Rating"]].mean()
 # Define categories and values
 categories = ["Rating", "Unhelpful Rating"]
 avg_values = avg_scores.tolist() 
+print()
+print("Average Restaurant Rating: ", np.round(avg_values[0],2))
+print("Average Unhelpful Restaurant Rating: ", np.round(avg_values[1],2))
+
 
 # Show average score from normal vs non-helpful reviews
 plt.figure(figsize=(6, 4))
@@ -238,42 +250,8 @@ reviews_filtered["Log_Review_Length"] = np.log10(reviews_filtered["Review_Length
 reviews_filtered = reviews_filtered.reset_index().set_index(["Name", "index"])
 
 # Define independent (X) and dependent (y) variables
-X = reviews_filtered[["Log_Review_Length"]].copy()
-X["Intercept"] = 1
+X = reviews_filtered[["Log_Review_Length"]]
 y = reviews_filtered["Rating"]
-
 # Run Fixed Effects (FE) model
 fe_model = PanelOLS(y, X, entity_effects=True).fit()
 print("Fixed Effects Model:\n", fe_model.summary)
-
-
-# Run Random Effects (RE) model
-re_model = RandomEffects(y, X).fit()
-print("\nRandom Effects Model:\n", re_model.summary)
-
-# Perform Hausman Test to determine whether to use FE or RE
-b_fe = fe_model.params.drop("const", errors="ignore")  # FE estimates
-b_re = re_model.params.drop("const", errors="ignore")  # RE estimates
-
-# Compute the difference
-diff = b_fe - b_re
-
-print(diff)
-
-# Compute covariance matrices
-V_fe = fe_model.cov.drop("const", errors="ignore").drop(columns="const", errors="ignore")
-V_re = re_model.cov.drop("const", errors="ignore").drop(columns="const", errors="ignore")
-
-# Compute Hausman statistic
-V_diff = V_fe - V_re
-hausman_stat = diff.T @ np.linalg.inv(V_diff) @ diff
-p_value = 1 - stats.chi2.cdf(hausman_stat, len(diff) - 1)
-
-print("\nHausman Test Statistic:", hausman_stat)
-print("p-value:", p_value)
-
-# Decision based on Hausman test result
-if p_value < 0.05:
-    print("Use Fixed Effects (FE) model (RE is inconsistent).")
-else:
-    print("Use Random Effects (RE) model (more efficient).")
