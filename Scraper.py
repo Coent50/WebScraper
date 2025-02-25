@@ -5,19 +5,20 @@ import re
 import time
 import random
 
-def get_html_with_retry(url, delay=3):
-    #Retries the request until successful
+def get_html(url): # Function to retrieve HTML content of a URL with retries if the request fails
+    
+    # Header used to disguise the scraper as a normal browser
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
     }
     while True:
         try:
-            html = requests.get(url, headers=headers)
-            if html.status_code == 200:
+            html = requests.get(url, headers=headers) # Attempts to send a get request to the URL 
+            if html.status_code == 200: # If request is successful (status code 200), return the HTML content
                 return html
             else:
-                print(f"HTTP Status {html.status_code}. Retrying...")
-        except requests.exceptions.RequestException as e:
+                print(f"HTTP Status {html.status_code}. Retrying...") # If request fails with any other status code, print message and retry
+        except requests.exceptions.RequestException as e: # Handles exception like network or request lib errors
             print(f"Error: {e}. Retrying...")
         
         # Wait for a random delay before retrying
@@ -25,7 +26,7 @@ def get_html_with_retry(url, delay=3):
 
 def home_page_scrap():
 
-    df_restaurants = pd.read_csv("Group 16 - Seattle.csv")
+    df_restaurants = pd.read_csv("Group 16 - Seattle.csv") # Create dataframe from csv
 
     data = [] 
 
@@ -35,8 +36,8 @@ def home_page_scrap():
         #collect variables for restaurants
         url = df_restaurants['url'][i]
         name_business = df_restaurants['name'][i]
-        html = get_html_with_retry(url)
-        soup = BeautifulSoup(html.content, 'lxml')
+        html = get_html(url) # Gets the HTML from the get_html function 
+        soup = BeautifulSoup(html.content, 'lxml') # Parse the HTML content using BeautifulSoup
 
         # Get ratings
         soup_stars=soup.select('.arrange-unit-fill__09f24__CUubG.y-css-1n5biw7 .y-css-1jz061g') 
@@ -86,8 +87,8 @@ def home_page_scrap():
             "Claimed": claimed[0] if claimed else "N/A"
         })
         
+        # Convert data to dataframe and save to CSV
         df_output = pd.DataFrame(data)
-        # Save to CSV
         df_output.to_csv("Group 16 - Seattle - HomePage.csv", index=False)
 
 home_page_scrap()
@@ -226,9 +227,11 @@ def non_rec_scrap ():
                     df_rating.to_csv(f, index=False, header=False, encoding='utf8')
                         
                 print(u)
-                time.sleep(2)
+
+                # Wait for a random delay before retrying
+                time.sleep(random.randint(5, 10))
             
             except Exception as e:
-                print(f"A page was not loaded correctly: {e}")
+                print(f"A page was not loaded correctly: {e}") # Catch and print errors in case a page was not loaded correctly
 
 non_rec_scrap ()
