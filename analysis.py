@@ -127,7 +127,7 @@ fig = px.choropleth(
     locations="Abbreviation",
     locationmode="USA-states",
     color="Log_Review_Count",
-    color_continuous_scale="Oranges",
+    color_continuous_scale="Blues",
     scope="usa",
     title="Review Frequency by U.S. State (Log Scale, Excluding WA)",
 )
@@ -175,14 +175,14 @@ average_ratings = [wa_average_rating, non_wa_average_rating]
 
 # Bar chart for review counts
 plt.figure(figsize=(6, 4))
-plt.bar(categories, review_counts, color=["black", "orange"])
+plt.bar(categories, review_counts, color=["#1f6fb4", "darkorange"])
 plt.ylabel("Number of Reviews")
 plt.title("Number of Reviews: Washington (WA) vs. Other States")
 plt.show()
 
 # Bar chart for average ratings
 plt.figure(figsize=(6, 4))
-plt.bar(categories, average_ratings, color=["black", "orange"])
+plt.bar(categories, average_ratings, color=["#1f6fb4", "darkorange"])
 plt.ylabel("Average Rating")
 plt.title("Average Rating: Washington (WA) vs. Other States")
 plt.ylim(0, 5)
@@ -206,8 +206,8 @@ print("Average Unhelpful Restaurant Rating: ", np.round(avg_values[1],2))
 
 
 # Show average score from normal vs non-helpful reviews
-plt.figure(figsize=(6, 4))
-plt.bar(categories, avg_values, color=["black", "orange"])
+plt.figure(figsize=(4, 4))
+plt.bar(categories, avg_values, color=["#1f6fb4", "darkorange"])
 plt.ylabel("Average of Averages")
 plt.ylim(0, 5)
 plt.title("Comparison of Average Ratings")
@@ -226,9 +226,9 @@ x = np.arange(len(categories))
 width = 0.35
 
 # Create the bar chart
-plt.figure(figsize=(8, 5))
-plt.bar(x - width/2, ratings, width, label="Rating", color="black")
-plt.bar(x + width/2, unhelpful_ratings, width, label="Unhelpful Rating", color="orange")
+plt.figure(figsize=(8, 4))
+plt.bar(x - width/2, ratings, width, label="Rating", color="#1f6fb4")
+plt.bar(x + width/2, unhelpful_ratings, width, label="Unhelpful Rating", color="darkorange")
 
 plt.xlabel("Price Category")
 plt.ylabel("Average Rating")
@@ -255,3 +255,30 @@ y = reviews_filtered["Rating"]
 # Run Fixed Effects (FE) model
 fe_model = PanelOLS(y, X, entity_effects=True).fit()
 print("Fixed Effects Model:\n", fe_model.summary)
+
+### Analyze rating trends of 4 most reviewed restaurants
+top_4_most_reviewed_names = reviews_df["Name"].value_counts().nlargest(4).index.tolist()
+
+# Convert the year to a two-digit format (e.g., 2005 → 05, 2019 → 19)
+reviews_df["Date"] = pd.to_datetime(reviews_df["Date"], errors="coerce")
+reviews_df["Year"] = reviews_df["Date"].dt.year.astype(str).str[-2:].str.zfill(2)
+
+# Get unique years and set bar width
+unique_years = sorted(reviews_df["Year"].dropna().unique())
+bar_width = 0.15
+x_positions = np.arange(len(unique_years))
+
+for restaurant in top_4_most_reviewed_names:
+    restaurant_reviews = reviews_df[reviews_df["Name"] == restaurant]
+    yearly_avg_rating = restaurant_reviews.groupby("Year")["Rating"].mean()
+    yearly_avg_rating = yearly_avg_rating.reindex(unique_years).replace(0, np.nan).interpolate()
+
+    plt.figure(figsize=(6, 4))
+    plt.plot(unique_years, yearly_avg_rating.values, marker="o", linestyle="-", color="#1f6fb4")
+    plt.xlabel("Year", labelpad=15)
+    plt.ylabel("Average Rating", labelpad=15)
+    plt.title(f"Average Rating per Year: {restaurant}", pad=20)
+    plt.xticks(unique_years, rotation=45)
+    plt.ylim(0, 5)
+    plt.tight_layout()
+    plt.show()
